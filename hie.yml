@@ -1,0 +1,6 @@
+cradle:
+  cabal:
+    - path: "./src"
+      component: "lib:sanskrit"
+    - path: "./app"
+      component: "exe:sanskrit"
