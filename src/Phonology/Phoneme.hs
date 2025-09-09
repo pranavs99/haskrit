@@ -15,7 +15,6 @@ isConsonant _               = False
 phonemeToString :: Phoneme -> String
 phonemeToString (Vowel name _)      = name
 phonemeToString (Consonant name _)  = name
-phonemeToString (Unrecognized name) = name
 
 phonemesOf :: String -> Either String [Phoneme]
 phonemesOf word = parse word [] where
