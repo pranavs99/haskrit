@@ -1,16 +1,18 @@
 module Main where
 
-import Phonology.Phoneme
+import Phonology.Sandhi
 
 
-run :: Show a => String -> (String -> Either String a) -> String -> IO ()
-run action f input = case f input of
-    Right result    -> print result
-    Left err        -> putStrLn ("error in " ++ action ++ ": " ++ err)
+run :: String -> (String -> String) -> String -> IO ()
+run action f input = let result = f input in
+    do
+        putStrLn ("action: " ++ action)
+        putStrLn ("input: " ++ input)
+        putStrLn ("result: " ++ result)
 
 
 main :: IO ()
 main = do
     putStrLn "enter input:"
-    word <- getLine
-    run "phoneme collection" phonemeNames word
+    sentence <- getLine
+    run "sandhification" applySandhiToSentence sentence

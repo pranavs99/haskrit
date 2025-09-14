@@ -26,5 +26,5 @@ data PlaceType =
     deriving (Show, Eq)
 
 data MannerType =
-    Plosive | Nasal | Approximant | Fricative
+    Vocalic | Plosive | Nasal | Approximant | Fricative
     deriving (Show, Eq)

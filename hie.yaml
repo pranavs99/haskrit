@@ -1,0 +1,10 @@
+cradle:
+  cabal:
+    - path: "src"
+      component: "lib:sanskrit"
+
+    - path: "app/Main.hs"
+      component: "sanskrit:exe:sanskrit"
+
+    - path: "test"
+      component: "sanskrit:test:sanskrit-test"

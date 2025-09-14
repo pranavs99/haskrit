@@ -52,6 +52,8 @@ library
     Phonology.Phoneme.Inventory
     Phonology.Phoneme.Types
     Phonology.Feature
+    Phonology.Utilities
+    Phonology.Sandhi
   -- Modules included in this library but not exported.
   -- other-modules:
   -- LANGUAGE extensions used by modules in this package.

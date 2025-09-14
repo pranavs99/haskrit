@@ -4,8 +4,25 @@ import Phonology.Phoneme.Types
 import Phonology.Feature
 
 
+matchPhonemeFrom :: String -> [Phoneme] -> Maybe Phoneme
+matchPhonemeFrom _ [] = Nothing
+matchPhonemeFrom s (ph : rest) = case ph of
+    Vowel sound fs
+        | sound == s -> Just (Vowel sound fs)
+    Consonant sound fs
+        | sound == s -> Just (Consonant s fs)
+    _ -> matchPhonemeFrom s rest
+
+matchPhoneme :: String -> Maybe Phoneme
+matchPhoneme s = matchPhonemeFrom s phonemes
+
+confirmPhoneme :: String -> Phoneme
+confirmPhoneme s = case matchPhoneme s of
+    Just ph -> ph
+    _       -> error "invariant violated: not a phoneme"
+
 vowels :: [Phoneme]
-vowels = [
+vowels = map addVocalicFeature [
     Vowel "a" [],
     Vowel "a:" [Length Long],
     Vowel "i" [],
@@ -19,10 +36,15 @@ vowels = [
     Vowel "aM" [],
     Vowel "aH" []]
 
+addVocalicFeature :: Phoneme -> Phoneme
+addVocalicFeature ph = case ph of
+    Vowel sound features    -> Vowel sound (Manner Vocalic : features)
+    other                   -> other
+
 consonants :: [Phoneme]
 consonants = [
     -- velar consonants
-    Consonant "k"   [Voicing Unvoiced, Aspiration Unaspirated, Place Velar, Manner Plosive],
+    Consonant "k" [Voicing Unvoiced, Aspiration Unaspirated, Place Velar, Manner Plosive],
     Consonant "kh"  [Voicing Unvoiced, Aspiration Aspirated, Place Velar, Manner Plosive],
     Consonant "g"   [Voicing Voiced, Aspiration Unaspirated, Place Velar, Manner Plosive],
     Consonant "gh"  [Voicing Voiced, Aspiration Aspirated, Place Velar, Manner Plosive],
@@ -65,14 +87,9 @@ consonants = [
 phonemes :: [Phoneme]
 phonemes = vowels ++ consonants
 
-matchPhonemeFrom :: String -> [Phoneme] -> Maybe Phoneme
-matchPhonemeFrom _ [] = Nothing
-matchPhonemeFrom s (ph : rest) = case ph of
-    Vowel sound fs
-        | sound == s -> Just (Vowel sound fs)
-    Consonant sound fs
-        | sound == s -> Just (Consonant s fs)
-    _ -> matchPhonemeFrom s rest
+{-
+    phoneme matching
 
-matchPhoneme :: String -> Maybe Phoneme
-matchPhoneme s = matchPhonemeFrom s phonemes
+    i wanted to move this to Phoneme.hs, but matchPhoneme must perform a valid
+    match from the enumerated inventory
+-}
