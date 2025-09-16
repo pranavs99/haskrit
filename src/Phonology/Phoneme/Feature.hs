@@ -1,4 +1,4 @@
-module Phonology.Feature where
+module Phonology.Phoneme.Feature where
 
 
 data Feature =
@@ -22,7 +22,7 @@ data AspirationType =
     deriving (Show, Eq)
 
 data PlaceType =
-    Velar | Palatal | Retroflex | Dental | Labial
+    Velar | Palatal | Retroflex | Dental | Labial | Bilabial
     deriving (Show, Eq)
 
 data MannerType =

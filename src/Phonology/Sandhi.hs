@@ -1,53 +1,34 @@
 module Phonology.Sandhi where
 
 import Phonology.Phoneme.Types
-import Phonology.Phoneme.Inventory
 import Phonology.Phoneme
+import Phonology.Sandhi.Types
+import Phonology.Sandhi.Vocalic
 import Phonology.Utilities as Utils
 
 
-data BoundarySandhiResult
-    = SandhifiedPhonemes [Phoneme]
-    | UnchangedPhonemes (Phoneme, Phoneme)
-    deriving (Show)
+{-
+    identify sandhi contexts and apply corresponding sandhi rules
 
-data SandhiResult
-    = Sandhita String
-    | UnchangedWords (String, String)
-    deriving (Show, Eq)
-
+    input: left and right context as Phonemes
+    output: either a successful boundary sandhi,
+            or a tuple containing the unchanged contexts
+-}
+applySandhiToPhonemes :: Phoneme -> Phoneme -> BoundarySandhiResult
+applySandhiToPhonemes leftContext rightContext
+    | isVowel leftContext && isVowel rightContext =
+        Phonology.Sandhi.Vocalic.applyVocalicSandhi leftContext rightContext
+    | otherwise =
+        UnchangedPhonemes (leftContext, rightContext)
 
 {-
-    savarNa
-    def) two vowels with the same quality
-    --> only the qualities "a", "i", and "u" can really exhibit this,
-        so qualityOf can only match with those vowels
+    extract sandhi contexts and stitch successful sandhi application results
+    into a Sandhita constructor
+
+    input: two contiguous words (can also be previous sandhitas) as Strings
+    output: either a successful sandhita, or a tuple containing the unchanged
+            input words
 -}
-matchesSavarNa :: Phoneme -> Phoneme -> Bool
-matchesSavarNa leftVowel rightVowel =
-    qualityOf leftVowel == qualityOf rightVowel
-
-applySavarNa :: Phoneme -> Phoneme -> BoundarySandhiResult
-applySavarNa leftVowel rightVowel = case qualityOf leftVowel of
-    "a" -> SandhifiedPhonemes [confirmPhoneme "a:"]
-    "i" -> SandhifiedPhonemes [confirmPhoneme "i:"]
-    "u" -> SandhifiedPhonemes [confirmPhoneme "u:"]
-    _   -> UnchangedPhonemes (leftVowel, rightVowel)
-
-applyVocalicSandhi :: Phoneme -> Phoneme -> BoundarySandhiResult
-applyVocalicSandhi leftVowel rightVowel
-    | matchesSavarNa leftVowel rightVowel =
-        applySavarNa leftVowel rightVowel
-    | otherwise =
-        UnchangedPhonemes (leftVowel, rightVowel)
-
-applySandhi :: Phoneme -> Phoneme -> BoundarySandhiResult
-applySandhi leftPhoneme rightPhoneme
-    | isVowel leftPhoneme && isVowel rightPhoneme =
-        applyVocalicSandhi leftPhoneme rightPhoneme
-    | otherwise =
-        UnchangedPhonemes (leftPhoneme, rightPhoneme)
-
 applySandhiToPair :: String -> String -> SandhiResult
 applySandhiToPair firstWord secondWord =
     let
@@ -58,7 +39,7 @@ applySandhiToPair firstWord secondWord =
         (rightContext, secondWordRemainder) =
             Utils.splitFirst secondWordPhonemes
     in
-        case applySandhi leftContext rightContext of
+        case applySandhiToPhonemes leftContext rightContext of
             SandhifiedPhonemes sandhifiedPhonemes ->
                 Sandhita
                     (concatMap soundOf firstWordRemainder
@@ -67,6 +48,13 @@ applySandhiToPair firstWord secondWord =
             UnchangedPhonemes _ ->
                 UnchangedWords (firstWord, secondWord)
 
+{-
+    apply sandhi over a list of words
+
+    input: list of words as Strings
+    output: successful sandhitas and unchanged words as Strings
+    --> keeps accumulating sandhitas if consecutive sandhi application succeeds
+-}
 applySandhiToWords :: [String] -> [String]
 applySandhiToWords sentenceWords =
     reverse (sandhify sentenceWords Nothing []) where
@@ -84,6 +72,27 @@ applySandhiToWords sentenceWords =
             UnchangedWords (prevSandhita, _) ->
                 sandhify rest (Just firstWord) (prevSandhita : sandhitaAcc)
 
-applySandhiToSentence :: String -> String
-applySandhiToSentence sentence =
+{-
+    entrypoint for sandhi application
+
+    input: sentence as String
+    output: sandhified sentence as String
+-}
+applySandhi :: String -> String
+applySandhi sentence =
     Prelude.unwords (applySandhiToWords (Prelude.words sentence))
+
+{-
+    IO testing function for sandhi application
+
+    input: sentence as String
+    output: sandhified interaction as IO ()
+-}
+runSandhi :: IO ()
+runSandhi = do
+    putStrLn ""
+    putStrLn "enter sentence to apply sandhi to:"
+    sentence <- getLine
+    putStrLn ""
+    putStrLn (applySandhi sentence)
+    putStrLn ""

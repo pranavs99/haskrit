@@ -12,7 +12,4 @@ run action f input = let result = f input in
 
 
 main :: IO ()
-main = do
-    putStrLn "enter input:"
-    sentence <- getLine
-    run "sandhification" applySandhiToSentence sentence
+main = runSandhi

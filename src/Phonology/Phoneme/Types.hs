@@ -1,6 +1,6 @@
 module Phonology.Phoneme.Types where
 
-import Phonology.Feature
+import Phonology.Phoneme.Feature
 
 {-
     avoiding a cyclic dependency
