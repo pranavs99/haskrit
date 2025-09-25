@@ -6,21 +6,38 @@ import Phonology.Phoneme.Feature
 
 vowels :: [Phoneme]
 vowels = [
-    Vowel "a"   [Manner Vocalic, Place Velar],
-    Vowel "a:"  [Manner Vocalic, Place Velar, Length Long],
-    Vowel "i"   [Manner Vocalic, Place Palatal],
-    Vowel "i:"  [Manner Vocalic, Place Palatal, Length Long],
-    Vowel "u"   [Manner Vocalic, Place Labial],
-    Vowel "u:"  [Manner Vocalic, Place Labial, Length Long],
-    Vowel "e"   [Manner Vocalic],
-    Vowel "ai"  [Manner Vocalic],
-    Vowel "o"   [Manner Vocalic],
-    Vowel "au"  [Manner Vocalic, Length Long],
-    Vowel "R"   [Manner Vocalic, Place Retroflex],
-    Vowel "R:"  [Manner Vocalic, Place Retroflex, Length Long],
-    Vowel "L"   [Manner Vocalic, Place Dental],
-    Vowel "aM"  [Manner Vocalic],
-    Vowel "aH"  [Manner Vocalic]]
+    Vowel "a"
+        [Length Short, Place Velar, VowelClass Monophthong, Manner Vocalic],
+    Vowel "a:"
+        [Length Long, Place Velar, VowelClass Monophthong, Manner Vocalic],
+    Vowel "i"
+        [Length Short, Place Palatal, VowelClass Monophthong, Manner Vocalic],
+    Vowel "i:"
+        [Length Long, Place Palatal, VowelClass Monophthong, Manner Vocalic],
+    Vowel "u"
+        [Length Short, Place Labial, VowelClass Monophthong, Manner Vocalic],
+    Vowel "u:"
+        [Length Long, Place Labial, VowelClass Monophthong, Manner Vocalic],
+    Vowel "R"
+        [Length Short, Place Retroflex, VowelClass Monophthong, Manner Vocalic],
+    Vowel "R:"
+        [Length Long, Place Retroflex, VowelClass Monophthong, Manner Vocalic],
+    Vowel "L"
+        [Length Short, Place Dental, VowelClass Monophthong, Manner Vocalic],
+    Vowel "L:"
+        [Length Long, Place Dental, VowelClass Monophthong, Manner Vocalic],
+    Vowel "e"
+        [Place Palatal, VowelClass Composite, Manner Vocalic],
+    Vowel "ai"
+        [Place Palatal, VowelClass Diphthong, Manner Vocalic],
+    Vowel "o"
+        [Place Labial, VowelClass Composite, Manner Vocalic],
+    Vowel "au"
+        [Place Labial, VowelClass Diphthong, Manner Vocalic],
+    Vowel "M"
+        [Manner Vocalic],
+    Vowel "H"
+        [Manner Vocalic]]
 
 consonants :: [Phoneme]
 consonants = [

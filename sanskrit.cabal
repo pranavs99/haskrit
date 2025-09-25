@@ -49,15 +49,17 @@ library
   -- Modules exported by the library.
   exposed-modules:
     Phonology.Phoneme
-    Phonology.Phoneme.Inventory
-    Phonology.Phoneme.Types
-    Phonology.Phoneme.Sutra
-    Phonology.Phoneme.Feature
     Phonology.Phoneme.Alternation
-    Phonology.Utilities
+    Phonology.Phoneme.Feature
+    Phonology.Phoneme.Inventory
+    Phonology.Phoneme.Sutra
+    Phonology.Phoneme.Types
     Phonology.Sandhi
-    Phonology.Sandhi.Vocalic
+    Phonology.Sandhi.Boundary
+    Phonology.Sandhi.Consonantal
     Phonology.Sandhi.Types
+    Phonology.Sandhi.Vocalic
+    Phonology.Utilities
   -- Modules included in this library but not exported.
   -- other-modules:
   -- LANGUAGE extensions used by modules in this package.

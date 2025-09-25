@@ -3,6 +3,7 @@ module Phonology.Phoneme where
 import Phonology.Phoneme.Types
 import Phonology.Phoneme.Inventory
 import Phonology.Phoneme.Feature
+import Phonology.Phoneme.Sutra
 import Phonology.Utilities as Utils
 
 
@@ -25,13 +26,20 @@ soundOf (Consonant sound _) = sound
 soundsMatch :: Phoneme -> Phoneme -> Bool
 soundsMatch = Utils.predicateMatches soundOf
 
+filterPhonemes :: Feature -> [Phoneme] -> [Phoneme]
+filterPhonemes _ [] = []
+filterPhonemes target (currPhoneme : restPhonemes)
+    | target `elem` featuresOf currPhoneme =
+        currPhoneme : filterPhonemes target restPhonemes
+    | otherwise =
+        filterPhonemes target restPhonemes
+
 qualityOf :: Phoneme -> String
-qualityOf (Vowel sound _) = case head sound of
-    'a' -> "a"
-    'i' -> "i"
-    'u' -> "u"
-    _   -> sound
-qualityOf (Consonant sound _) = sound
+qualityOf phoneme
+    | inSutra phoneme "a" "k" =
+        [head (soundOf phoneme)]
+    | otherwise =
+        soundOf phoneme
 
 qualitiesMatch :: Phoneme -> Phoneme -> Bool
 qualitiesMatch = Utils.predicateMatches qualityOf
@@ -40,22 +48,35 @@ featuresOf :: Phoneme -> [Feature]
 featuresOf (Vowel _ features)       = features
 featuresOf (Consonant _ features)   = features
 
+findFeatures :: [String] -> Phoneme -> [Feature]
+findFeatures [] _ = []
+findFeatures (currId : restIds) phoneme =
+    findFeatureById currId (featuresOf phoneme) : findFeatures restIds phoneme
+
+inSutra :: Phoneme -> String -> String -> Bool
+inSutra phoneme start marker =
+    soundOf phoneme `elem` matchSutra start marker
+
+confirmSutra :: String -> String -> [Phoneme]
+confirmSutra start marker =
+    map confirmPhoneme (matchSutra start marker)
+
 {-
-    input: sound as String
+    input:  sound as String
     output: possibly the Phoneme with the given sound
+
+    --> for use when sound can optionally not produce a Phoneme
 -}
 lookupPhoneme :: String -> Maybe Phoneme
 lookupPhoneme sound = match sound Phonology.Phoneme.Inventory.phonemes where
     match :: String -> [Phoneme] -> Maybe Phoneme
     match _ [] = Nothing
     match s (currPhoneme : restPhonemes)
-        | soundOf currPhoneme == s =
-            Just currPhoneme
-        | otherwise =
-            match s restPhonemes
+        | soundOf currPhoneme == s  = Just currPhoneme
+        | otherwise                 = match s restPhonemes
 
 {-
-    input: sound as String
+    input:  sound as String
     output: the Phoneme with the given sound
     errors: if no Phoneme found
 
@@ -64,21 +85,33 @@ lookupPhoneme sound = match sound Phonology.Phoneme.Inventory.phonemes where
 confirmPhoneme :: String -> Phoneme
 confirmPhoneme sound = case lookupPhoneme sound of
     Just ph -> ph
-    _       -> error "invariant violated: not a phoneme"
+    _       -> error ("invariant violated, not a phoneme: " ++ sound)
 
 {-
-    input: given features as [Feature]
+    input:  features to match as [Feature]
+    output: the Phoneme containing all given features
+    errors: if no Phoneme found
+-}
+confirmPhonemeOn :: [Feature] -> Phoneme
+confirmPhonemeOn targets = case matchPhoneme targets of
+    Just ph -> ph
+    _ -> error
+        ("invariant violated, no phoneme for features: "
+        ++ show targets)
+
+{-
+    input:  given features as [Feature]
     output: possibly a Phoneme that contains all given features
 -}
 matchPhoneme :: [Feature] -> Maybe Phoneme
 matchPhoneme givenFeatures = match givenFeatures phonemes where
     match :: [Feature] -> [Phoneme] -> Maybe Phoneme
     match _ [] = Nothing
-    match given (currPhoneme : restPhonemes)
-        | Utils.isSubsetOf given (featuresOf currPhoneme) =
+    match givens (currPhoneme : restPhonemes)
+        | Utils.isSubsetOf givens (featuresOf currPhoneme) =
             Just currPhoneme
         | otherwise =
-            match given restPhonemes
+            match givens restPhonemes
 
 {-
     input: word as String
@@ -100,7 +133,7 @@ phonemesOf word = parse word [] where
             Nothing         -> error ("unrecognized phoneme: " ++ [c1])
 
 {-
-    input: word as String
+    input:  word as String
     output: a list of sounds from valid Phonemes as [String]
     errors: if phonemesOf finds an invalid Phoneme
 -}
